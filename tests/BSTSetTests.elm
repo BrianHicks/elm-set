@@ -89,6 +89,22 @@ size =
                 |> Expect.equal (NSet.size <| NSet.fromList xs)
 
 
+contains : Test
+contains =
+    describe "contains"
+        [ fuzz Fuzz.int "true" <|
+            \i ->
+                Set.singleton i
+                    |> Set.contains i
+                    |> Expect.equal True
+        , fuzz Fuzz.int "false" <|
+            \i ->
+                Set.singleton (i + 1)
+                    |> Set.contains i
+                    |> Expect.equal False
+        ]
+
+
 listOps : Test
 listOps =
     describe "fromList and toList"
@@ -109,5 +125,6 @@ all =
         , foldr
         , insert
         , size
+        , contains
         , listOps
         ]

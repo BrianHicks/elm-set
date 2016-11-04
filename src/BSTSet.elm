@@ -6,6 +6,10 @@ type Set comparable
     | Empty
 
 
+
+-- build
+
+
 empty : Set comparable
 empty =
     Empty
@@ -14,26 +18,6 @@ empty =
 singleton : comparable -> Set comparable
 singleton item =
     Branch item empty empty
-
-
-foldr : (Set comparable -> a -> a) -> a -> Set comparable -> a
-foldr fn dest set =
-    case set of
-        Empty ->
-            fn set dest
-
-        Branch _ left right ->
-            let
-                tmpr =
-                    foldr fn dest right
-
-                tmps =
-                    fn set tmpr
-
-                tmpl =
-                    foldr fn tmps left
-            in
-                tmpl
 
 
 insert : comparable -> Set comparable -> Set comparable
@@ -51,6 +35,36 @@ insert item tree =
                 tree
 
 
+
+-- combine
+
+
+sum : Set comparable -> Set comparable -> Set comparable
+sum a b =
+    a
+        |> toList
+        |> List.foldl insert b
+
+
+
+-- querying
+
+
+contains : comparable -> Set comparable -> Bool
+contains item set =
+    case set of
+        Empty ->
+            False
+
+        Branch cmp left right ->
+            if item < cmp then
+                contains item left
+            else if item > cmp then
+                contains item right
+            else
+                True
+
+
 size : Set comparable -> Int
 size =
     let
@@ -64,6 +78,10 @@ size =
                     current + 1
     in
         foldr counter 0
+
+
+
+-- lists
 
 
 fromList : List comparable -> Set comparable
@@ -86,11 +104,28 @@ toList =
         foldr lister []
 
 
-combine : Set comparable -> Set comparable -> Set comparable
-combine a b =
-    a
-        |> toList
-        |> List.foldl insert b
+
+-- transform
+
+
+foldr : (Set comparable -> a -> a) -> a -> Set comparable -> a
+foldr fn dest set =
+    case set of
+        Empty ->
+            fn set dest
+
+        Branch _ left right ->
+            let
+                tmpr =
+                    foldr fn dest right
+
+                tmps =
+                    fn set tmpr
+
+                tmpl =
+                    foldr fn tmps left
+            in
+                tmpl
 
 
 
