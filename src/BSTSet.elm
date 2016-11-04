@@ -39,8 +39,8 @@ insert item tree =
 -- combine
 
 
-sum : Set comparable -> Set comparable -> Set comparable
-sum a b =
+union : Set comparable -> Set comparable -> Set comparable
+union a b =
     a
         |> toList
         |> List.foldl insert b

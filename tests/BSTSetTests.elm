@@ -80,6 +80,30 @@ insert =
         ]
 
 
+union : Test
+union =
+    describe "union"
+        [ fuzz Fuzz.int "same" <|
+            \i ->
+                Set.singleton i
+                    |> Set.union (Set.singleton i)
+                    |> Expect.equal (Set.singleton i)
+        , fuzz (Fuzz.tuple ( Fuzz.int, Fuzz.int )) "different" <|
+            \( i, j ) ->
+                let
+                    expectation =
+                        if i == j then
+                            [ i ]
+                        else
+                            [ i, j ] |> List.sort
+                in
+                    Set.singleton i
+                        |> Set.union (Set.singleton j)
+                        |> Set.toList
+                        |> Expect.equal expectation
+        ]
+
+
 size : Test
 size =
     fuzz (Fuzz.list Fuzz.int) "size" <|
@@ -124,6 +148,7 @@ all =
         , singleton
         , foldr
         , insert
+        , union
         , size
         , contains
         , listOps
