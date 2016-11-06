@@ -20,7 +20,7 @@ singleton : Test
 singleton =
     fuzz Fuzz.int "singleton" <|
         \i ->
-            Expect.equal (Set.singleton i) (Set.Branch i Set.Empty Set.Empty)
+            Expect.equal (Set.singleton i) (Set.Set i Set.Empty Set.Empty)
 
 
 foldr : Test
@@ -34,7 +34,7 @@ foldr =
                         Set.Empty ->
                             total
 
-                        Set.Branch _ _ _ ->
+                        Set.Set _ _ _ ->
                             1 + total
 
                 base =
@@ -46,7 +46,7 @@ foldr =
                             |> Expect.equal 0
                 , test "branch" <|
                     \() ->
-                        Set.foldr sum 0 (Set.Branch 1 Set.Empty Set.Empty)
+                        Set.foldr sum 0 (Set.Set 1 Set.Empty Set.Empty)
                             |> Expect.equal 1
                 ]
         ]
@@ -59,18 +59,18 @@ insert =
             \i ->
                 Set.Empty
                     |> Set.insert i
-                    |> Expect.equal (Set.Branch i Set.Empty Set.Empty)
+                    |> Expect.equal (Set.Set i Set.Empty Set.Empty)
         , describe "into nonempty"
             [ fuzz Fuzz.int "when inserted is greater than head" <|
                 \i ->
                     Set.singleton (i - 1)
                         |> Set.insert i
-                        |> Expect.equal (Set.Branch (i - 1) Set.Empty (Set.Branch i Set.Empty Set.Empty))
+                        |> Expect.equal (Set.Set (i - 1) Set.Empty (Set.Set i Set.Empty Set.Empty))
             , fuzz Fuzz.int "when inserted is less than head" <|
                 \i ->
                     Set.singleton (i + 1)
                         |> Set.insert i
-                        |> Expect.equal (Set.Branch (i + 1) (Set.Branch i Set.Empty Set.Empty) Set.Empty)
+                        |> Expect.equal (Set.Set (i + 1) (Set.Set i Set.Empty Set.Empty) Set.Empty)
             , fuzz Fuzz.int "when inserted is equal to head" <|
                 \i ->
                     Set.singleton i
@@ -113,18 +113,18 @@ size =
                 |> Expect.equal (NSet.size <| NSet.fromList xs)
 
 
-contains : Test
-contains =
-    describe "contains"
+member : Test
+member =
+    describe "member"
         [ fuzz Fuzz.int "true" <|
             \i ->
                 Set.singleton i
-                    |> Set.contains i
+                    |> Set.member i
                     |> Expect.equal True
         , fuzz Fuzz.int "false" <|
             \i ->
                 Set.singleton (i + 1)
-                    |> Set.contains i
+                    |> Set.member i
                     |> Expect.equal False
         ]
 
@@ -150,6 +150,6 @@ all =
         , insert
         , union
         , size
-        , contains
+        , member
         , listOps
         ]
