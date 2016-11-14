@@ -48,21 +48,23 @@ union a b =
 
 
 -- querying
+-- member : comparable -> Set comparable -> Bool
+-- member item set =
+--     case set of
+--         Empty ->
+--             False
+--         Tree head left right ->
+--             if item == head then
+--                 True
+--             else if item < head then
+--                 member item left
+--             else
+--                 member item right
 
 
 member : comparable -> Set comparable -> Bool
-member item set =
-    case set of
-        Empty ->
-            False
-
-        Tree head left right ->
-            if item == head then
-                True
-            else if item < head then
-                member item left
-            else
-                member item right
+member item =
+    foldr (\candidate acc -> acc || (candidate == item)) False
 
 
 
