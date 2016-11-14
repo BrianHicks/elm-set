@@ -2,7 +2,7 @@ module BSTSet exposing (..)
 
 
 type Set comparable
-    = Set comparable (Set comparable) (Set comparable)
+    = Tree comparable (Set comparable) (Set comparable)
     | Empty
 
 
@@ -17,7 +17,7 @@ empty =
 
 singleton : comparable -> Set comparable
 singleton item =
-    Set item empty empty
+    Tree item empty empty
 
 
 insert : comparable -> Set comparable -> Set comparable
@@ -26,11 +26,11 @@ insert item set =
         Empty ->
             singleton item
 
-        Set head left right ->
+        Tree head left right ->
             if item < head then
-                Set head (insert item left) right
+                Tree head (insert item left) right
             else if item > head then
-                Set head left (insert item right)
+                Tree head left (insert item right)
             else
                 set
 
@@ -56,7 +56,7 @@ member item set =
         Empty ->
             False
 
-        Set head left right ->
+        Tree head left right ->
             if item == head then
                 True
             else if item < head then
@@ -66,21 +66,28 @@ member item set =
 
 
 size : Set comparable -> Int
-size =
-    let
-        counter : Set comparable -> Int -> Int
-        counter set current =
-            case set of
-                Empty ->
-                    current
+size set =
+    case set of
+        Empty ->
+            0
 
-                Set _ _ _ ->
-                    current + 1
-    in
-        foldr counter 0
+        Tree head left right ->
+            1 + size left + size right
 
 
 
+-- size : Set comparable -> Int
+-- size =
+--     let
+--         counter : Set comparable -> Int -> Int
+--         counter set current =
+--             case set of
+--                 Empty ->
+--                     current
+--                 Tree _ _ _ ->
+--                     current + 1
+--     in
+--         foldr counter 0
 -- lists
 
 
@@ -98,7 +105,7 @@ toList =
                 Empty ->
                     list
 
-                Set val _ _ ->
+                Tree val _ _ ->
                     val :: list
     in
         foldr lister []
@@ -114,7 +121,7 @@ foldr fn dest set =
         Empty ->
             fn set dest
 
-        Set _ left right ->
+        Tree _ left right ->
             let
                 tmpr =
                     foldr fn dest right
@@ -134,10 +141,10 @@ foldr fn dest set =
 --     case tree of
 --         Leaf ->
 --             tree
---         Set cmp left right ->
+--         Tree cmp left right ->
 --             if item < cmp then
---                 Set cmp (delete item left) right
+--                 Tree cmp (delete item left) right
 --             else if item > cmp then
---                 Set cmp left (delete item right)
+--                 Tree cmp left (delete item right)
 --             else
 --                 combine left right
