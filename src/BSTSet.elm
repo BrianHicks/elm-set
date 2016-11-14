@@ -65,30 +65,19 @@ member item set =
                 member item right
 
 
-size : Set comparable -> Int
-size set =
-    case set of
-        Empty ->
-            0
-
-        Tree head left right ->
-            1 + size left + size right
-
-
 
 -- size : Set comparable -> Int
--- size =
---     let
---         counter : Set comparable -> Int -> Int
---         counter set current =
---             case set of
---                 Empty ->
---                     current
---                 Tree _ _ _ ->
---                     current + 1
---     in
---         foldr counter 0
--- lists
+-- size set =
+--     case set of
+--         Empty ->
+--             0
+--         Tree head left right ->
+--             1 + size left + size right
+
+
+size : Set comparable -> Int
+size =
+    foldr (\_ count -> count + 1) 0
 
 
 fromList : List comparable -> Set comparable
