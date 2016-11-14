@@ -98,41 +98,51 @@ fromList items =
 
 toList : Set comparable -> List comparable
 toList =
-    let
-        lister : Set comparable -> List comparable -> List comparable
-        lister set list =
-            case set of
-                Empty ->
-                    list
-
-                Tree val _ _ ->
-                    val :: list
-    in
-        foldr lister []
+    foldr (::) []
 
 
 
 -- transform
 
 
-foldr : (Set comparable -> a -> a) -> a -> Set comparable -> a
-foldr fn dest set =
+foldr : (comparable -> a -> a) -> a -> Set comparable -> a
+foldr fn acc set =
     case set of
         Empty ->
-            fn set dest
+            acc
 
-        Tree _ left right ->
+        Tree head left right ->
             let
                 tmpr =
-                    foldr fn dest right
+                    foldr fn acc right
 
-                tmps =
-                    fn set tmpr
+                tmph =
+                    fn head tmpr
 
                 tmpl =
-                    foldr fn tmps left
+                    foldr fn tmph left
             in
                 tmpl
+
+
+foldl : (comparable -> a -> a) -> a -> Set comparable -> a
+foldl fn acc set =
+    case set of
+        Empty ->
+            acc
+
+        Tree head left right ->
+            let
+                tmpl =
+                    foldl fn acc left
+
+                tmph =
+                    fn head tmpl
+
+                tmpr =
+                    foldl fn tmph right
+            in
+                tmpr
 
 
 

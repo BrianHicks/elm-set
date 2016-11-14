@@ -27,28 +27,31 @@ foldr : Test
 foldr =
     describe "foldr"
         [ describe "test by counting" <|
-            let
-                sum : Set.Set comparable -> Int -> Int
-                sum set total =
-                    case set of
-                        Set.Empty ->
-                            total
+            [ test "empty" <|
+                \() ->
+                    Set.foldr (+) 0 Set.Empty
+                        |> Expect.equal 0
+            , test "branch" <|
+                \() ->
+                    Set.foldr (+) 0 (Set.Tree 1 Set.Empty Set.Empty)
+                        |> Expect.equal 1
+            ]
+        ]
 
-                        Set.Tree _ _ _ ->
-                            1 + total
 
-                base =
-                    Set.Empty
-            in
-                [ test "empty" <|
-                    \() ->
-                        Set.foldr sum 0 Set.Empty
-                            |> Expect.equal 0
-                , test "branch" <|
-                    \() ->
-                        Set.foldr sum 0 (Set.Tree 1 Set.Empty Set.Empty)
-                            |> Expect.equal 1
-                ]
+foldl : Test
+foldl =
+    describe "foldl"
+        [ describe "test by counting" <|
+            [ test "empty" <|
+                \() ->
+                    Set.foldl (+) 0 Set.Empty
+                        |> Expect.equal 0
+            , test "branch" <|
+                \() ->
+                    Set.foldl (+) 0 (Set.Tree 1 Set.Empty Set.Empty)
+                        |> Expect.equal 1
+            ]
         ]
 
 
@@ -147,6 +150,7 @@ all =
         [ empty
         , singleton
         , foldr
+        , foldl
         , insert
         , union
         , size
