@@ -61,33 +61,11 @@ union =
 
 
 -- querying
--- member : comparable -> Set comparable -> Bool
--- member item set =
---     case set of
---         Empty ->
---             False
---         Tree head left right ->
---             if item == head then
---                 True
---             else if item < head then
---                 member item left
---             else
---                 member item right
 
 
 member : comparable -> Set comparable -> Bool
 member item =
     foldr (\candidate acc -> acc || (candidate == item)) False
-
-
-
--- size : Set comparable -> Int
--- size set =
---     case set of
---         Empty ->
---             0
---         Tree _ left right ->
---             1 + size left + size right
 
 
 size : Set comparable -> Int
