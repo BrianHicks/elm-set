@@ -23,6 +23,22 @@ singleton =
             Expect.equal (Set.singleton i) (Set.Tree i Set.Empty Set.Empty)
 
 
+remove : Test
+remove =
+    describe "remove"
+        [ test "empty" <|
+            \_ ->
+                Set.empty
+                    |> Set.remove 1
+                    |> Expect.equal Set.empty
+        , fuzz Fuzz.int "singleton" <|
+            \i ->
+                Set.singleton i
+                    |> Set.remove i
+                    |> Expect.equal Set.empty
+        ]
+
+
 foldr : Test
 foldr =
     describe "foldr"
@@ -144,11 +160,33 @@ listOps =
         ]
 
 
+filter : Test
+filter =
+    describe "filter"
+        [ test "empty" <|
+            \_ ->
+                Set.empty
+                    |> Set.filter (always False)
+                    |> Expect.equal Set.empty
+        , fuzz Fuzz.int "matches" <|
+            \i ->
+                Set.singleton i
+                    |> Set.filter ((==) i)
+                    |> Expect.equal Set.empty
+        , fuzz Fuzz.int "does not match" <|
+            \i ->
+                Set.singleton i
+                    |> Set.filter ((==) (i + 1))
+                    |> Expect.equal (Set.singleton i)
+        ]
+
+
 all : Test
 all =
     concat
         [ empty
         , singleton
+        , remove
         , foldr
         , foldl
         , insert
@@ -156,4 +194,5 @@ all =
         , size
         , member
         , listOps
+        , filter
         ]

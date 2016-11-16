@@ -35,15 +35,28 @@ insert item set =
                 set
 
 
+remove : comparable -> Set comparable -> Set comparable
+remove item set =
+    case set of
+        Empty ->
+            set
+
+        Tree head left right ->
+            if item < head then
+                Tree head (remove item left) right
+            else if item > head then
+                Tree head left (remove item right)
+            else
+                union left right
+
+
 
 -- combine
 
 
 union : Set comparable -> Set comparable -> Set comparable
-union a b =
-    a
-        |> toList
-        |> List.foldl insert b
+union =
+    foldl insert
 
 
 
@@ -73,7 +86,7 @@ member item =
 --     case set of
 --         Empty ->
 --             0
---         Tree head left right ->
+--         Tree _ left right ->
 --             1 + size left + size right
 
 
@@ -104,16 +117,16 @@ foldr fn acc set =
 
         Tree head left right ->
             let
-                tmpr =
+                accRight =
                     foldr fn acc right
 
-                tmph =
-                    fn head tmpr
+                accHead =
+                    fn head accRight
 
-                tmpl =
-                    foldr fn tmph left
+                accLeft =
+                    foldr fn accHead left
             in
-                tmpl
+                accLeft
 
 
 foldl : (comparable -> a -> a) -> a -> Set comparable -> a
@@ -124,28 +137,26 @@ foldl fn acc set =
 
         Tree head left right ->
             let
-                tmpl =
+                accLeft =
                     foldl fn acc left
 
-                tmph =
-                    fn head tmpl
+                accHead =
+                    fn head accLeft
 
-                tmpr =
-                    foldl fn tmph right
+                accRight =
+                    foldl fn accHead right
             in
-                tmpr
+                accRight
 
 
-
--- delete : comparable -> BST comparable -> BST comparable
--- delete item tree =
---     case tree of
---         Leaf ->
---             tree
---         Tree cmp left right ->
---             if item < cmp then
---                 Tree cmp (delete item left) right
---             else if item > cmp then
---                 Tree cmp left (delete item right)
---             else
---                 combine left right
+filter : (comparable -> Bool) -> Set comparable -> Set comparable
+filter cmp set =
+    foldl
+        (\head acc ->
+            if cmp head then
+                remove head acc
+            else
+                acc
+        )
+        set
+        set
