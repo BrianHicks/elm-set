@@ -123,6 +123,44 @@ union =
         ]
 
 
+intersect : Test
+intersect =
+    describe "intersect"
+        [ fuzz Fuzz.int "same" <|
+            \i ->
+                Set.singleton i
+                    |> Set.intersect (Set.singleton i)
+                    |> Expect.equal (Set.singleton i)
+        , fuzz (Fuzz.tuple ( Fuzz.int, Fuzz.int )) "different" <|
+            \( i, j ) ->
+                if i == j then
+                    Expect.true "we're not testing this" True
+                else
+                    Set.singleton i
+                        |> Set.intersect (Set.singleton j)
+                        |> Expect.equal Set.empty
+        ]
+
+
+diff : Test
+diff =
+    describe "diff"
+        [ fuzz Fuzz.int "same" <|
+            \i ->
+                Set.singleton i
+                    |> Set.diff (Set.singleton i)
+                    |> Expect.equal Set.empty
+        , fuzz (Fuzz.tuple ( Fuzz.int, Fuzz.int )) "different" <|
+            \( i, j ) ->
+                if i == j then
+                    Expect.true "we're not testing this" True
+                else
+                    Set.fromList [ i, j ]
+                        |> Set.diff (Set.singleton j)
+                        |> Expect.equal (Set.singleton i)
+        ]
+
+
 size : Test
 size =
     fuzz (Fuzz.list Fuzz.int) "size" <|
@@ -172,12 +210,12 @@ filter =
             \i ->
                 Set.singleton i
                     |> Set.filter ((==) i)
-                    |> Expect.equal Set.empty
+                    |> Expect.equal (Set.singleton i)
         , fuzz Fuzz.int "does not match" <|
             \i ->
                 Set.singleton i
                     |> Set.filter ((==) (i + 1))
-                    |> Expect.equal (Set.singleton i)
+                    |> Expect.equal Set.empty
         ]
 
 
@@ -191,6 +229,8 @@ all =
         , foldl
         , insert
         , union
+        , intersect
+        , diff
         , size
         , member
         , listOps

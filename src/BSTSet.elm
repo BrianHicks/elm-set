@@ -59,6 +59,16 @@ union =
     foldl insert
 
 
+intersect : Set comparable -> Set comparable -> Set comparable
+intersect a b =
+    filter ((flip member) a) b
+
+
+diff : Set comparable -> Set comparable -> Set comparable
+diff a b =
+    filter (not << (flip member) a) b
+
+
 
 -- querying
 
@@ -132,9 +142,9 @@ filter cmp set =
     foldl
         (\head acc ->
             if cmp head then
-                remove head acc
-            else
                 acc
+            else
+                remove head acc
         )
         set
         set
