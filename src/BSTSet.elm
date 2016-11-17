@@ -2,7 +2,7 @@ module BSTSet exposing (..)
 
 
 type Set comparable
-    = Tree comparable (Set comparable) (Set comparable)
+    = Tree Int comparable (Set comparable) (Set comparable)
     | Empty
 
 
@@ -17,7 +17,12 @@ empty =
 
 singleton : comparable -> Set comparable
 singleton item =
-    Tree item empty empty
+    Tree 1 item empty empty
+
+
+tree : comparable -> Set comparable -> Set comparable -> Set comparable
+tree head left right =
+    Tree (max (height left) (height right) |> (+) 1) head left right
 
 
 insert : comparable -> Set comparable -> Set comparable
@@ -26,125 +31,154 @@ insert item set =
         Empty ->
             singleton item
 
-        Tree head left right ->
+        Tree _ head left right ->
             if item < head then
-                Tree head (insert item left) right
+                tree head (insert item left) right |> balance
             else if item > head then
-                Tree head left (insert item right)
+                tree head left (insert item right) |> balance
             else
                 set
 
 
-remove : comparable -> Set comparable -> Set comparable
-remove item set =
+
+-- remove : comparable -> Set comparable -> Set comparable
+-- remove item set =
+--     case set of
+--         Empty ->
+--             set
+--         Tree head left right ->
+--             if item < head then
+--                 Tree head (remove item left) right
+--             else if item > head then
+--                 Tree head left (remove item right)
+--             else
+--                 union left right
+-- -- combine
+-- union : Set comparable -> Set comparable -> Set comparable
+-- union =
+--     foldl insert
+-- intersect : Set comparable -> Set comparable -> Set comparable
+-- intersect a b =
+--     filter ((flip member) a) b
+-- diff : Set comparable -> Set comparable -> Set comparable
+-- diff a b =
+--     filter (not << (flip member) a) b
+-- querying
+-- member : comparable -> Set comparable -> Bool
+-- member item =
+--     foldr (\candidate acc -> acc || (candidate == item)) False
+
+
+size : Set comparable -> Int
+size set =
+    case set of
+        Empty ->
+            0
+
+        Tree _ _ left right ->
+            1 + size left + size right
+
+
+height : Set comparable -> Int
+height set =
+    case set of
+        Empty ->
+            0
+
+        Tree height _ _ _ ->
+            height
+
+
+
+-- fromList : List comparable -> Set comparable
+-- fromList items =
+--     List.foldl insert empty items
+-- toList : Set comparable -> List comparable
+-- toList =
+--     foldr (::) []
+-- -- transform
+-- foldr : (comparable -> a -> a) -> a -> Set comparable -> a
+-- foldr fn acc set =
+--     case set of
+--         Empty ->
+--             acc
+--         Tree head left right ->
+--             let
+--                 accRight =
+--                     foldr fn acc right
+--                 accHead =
+--                     fn head accRight
+--                 accLeft =
+--                     foldr fn accHead left
+--             in
+--                 accLeft
+-- foldl : (comparable -> a -> a) -> a -> Set comparable -> a
+-- foldl fn acc set =
+--     case set of
+--         Empty ->
+--             acc
+--         Tree head left right ->
+--             let
+--                 accLeft =
+--                     foldl fn acc left
+--                 accHead =
+--                     fn head accLeft
+--                 accRight =
+--                     foldl fn accHead right
+--             in
+--                 accRight
+-- filter : (comparable -> Bool) -> Set comparable -> Set comparable
+-- filter cmp set =
+--     foldl
+--         (\head acc ->
+--             if cmp head then
+--                 acc
+--             else
+--                 remove head acc
+--         )
+--         set
+--         set
+-- rebalancing
+
+
+balance : Set comparable -> Set comparable
+balance set =
     case set of
         Empty ->
             set
 
-        Tree head left right ->
-            if item < head then
-                Tree head (remove item left) right
-            else if item > head then
-                Tree head left (remove item right)
-            else
-                union left right
-
-
-
--- combine
-
-
-union : Set comparable -> Set comparable -> Set comparable
-union =
-    foldl insert
-
-
-intersect : Set comparable -> Set comparable -> Set comparable
-intersect a b =
-    filter ((flip member) a) b
-
-
-diff : Set comparable -> Set comparable -> Set comparable
-diff a b =
-    filter (not << (flip member) a) b
-
-
-
--- querying
-
-
-member : comparable -> Set comparable -> Bool
-member item =
-    foldr (\candidate acc -> acc || (candidate == item)) False
-
-
-size : Set comparable -> Int
-size =
-    foldr (\_ count -> count + 1) 0
-
-
-fromList : List comparable -> Set comparable
-fromList items =
-    List.foldl insert empty items
-
-
-toList : Set comparable -> List comparable
-toList =
-    foldr (::) []
-
-
-
--- transform
-
-
-foldr : (comparable -> a -> a) -> a -> Set comparable -> a
-foldr fn acc set =
-    case set of
-        Empty ->
-            acc
-
-        Tree head left right ->
+        Tree _ head left right ->
             let
-                accRight =
-                    foldr fn acc right
-
-                accHead =
-                    fn head accRight
-
-                accLeft =
-                    foldr fn accHead left
+                balance =
+                    height right - height left
             in
-                accLeft
+                if balance < -2 then
+                    rotr set
+                else if balance == -2 then
+                    rotr <| tree head (rotl left) right
+                else if balance > 2 then
+                    rotl set
+                else if balance == 2 then
+                    rotl <| tree head left (rotr right)
+                else
+                    set
 
 
-foldl : (comparable -> a -> a) -> a -> Set comparable -> a
-foldl fn acc set =
+rotl : Set comparable -> Set comparable
+rotl set =
     case set of
-        Empty ->
-            acc
+        Tree _ head lessThans (Tree _ subHead betweens greaterThans) ->
+            tree subHead (tree head lessThans betweens) greaterThans
 
-        Tree head left right ->
-            let
-                accLeft =
-                    foldl fn acc left
-
-                accHead =
-                    fn head accLeft
-
-                accRight =
-                    foldl fn accHead right
-            in
-                accRight
+        _ ->
+            set
 
 
-filter : (comparable -> Bool) -> Set comparable -> Set comparable
-filter cmp set =
-    foldl
-        (\head acc ->
-            if cmp head then
-                acc
-            else
-                remove head acc
-        )
-        set
-        set
+rotr : Set comparable -> Set comparable
+rotr set =
+    case set of
+        Tree _ head (Tree _ subHead lessThans betweens) greaterThans ->
+            tree subHead lessThans (tree head betweens greaterThans)
+
+        _ ->
+            set
