@@ -2,10 +2,10 @@ port module Main exposing (..)
 
 import BSTSetTests
 import Json.Encode exposing (Value)
-import Test.Runner.Node exposing (run)
+import Test.Runner.Node exposing (run, TestProgram)
 
 
-main : Program Value
+main : TestProgram
 main =
     run emit BSTSetTests.all
 
