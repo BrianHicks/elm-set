@@ -40,6 +40,21 @@ insert item set =
                 set
 
 
+naiveInsert : comparable -> Set comparable -> Set comparable
+naiveInsert item set =
+    case set of
+        Empty ->
+            singleton item
+
+        Tree _ head left right ->
+            if item < head then
+                tree head (naiveInsert item left) right
+            else if item > head then
+                tree head left (naiveInsert item right)
+            else
+                set
+
+
 
 -- remove : comparable -> Set comparable -> Set comparable
 -- remove item set =
