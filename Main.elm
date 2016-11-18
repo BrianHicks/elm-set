@@ -74,7 +74,7 @@ setView set =
                     ]
                 ]
                 [ span [ style [ ( "text-align", "center" ) ] ]
-                    [ "Value: \"" ++ head ++ "\" Height Balance: " ++ (toString balance) |> text ]
+                    [ "Value: \"" ++ head ++ "\" Height Balance: " ++ (height right - height left |> toString) |> text ]
                 , div
                     [ style [ ( "display", "flex" ) ] ]
                     [ setView left
