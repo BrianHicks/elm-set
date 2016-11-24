@@ -9,6 +9,9 @@ import String
 import Test exposing (..)
 
 
+-- build
+
+
 empty : Test
 empty =
     test "empty" <|
@@ -48,6 +51,35 @@ insert =
                         |> Set.insert i
                         |> Expect.equal (Set.singleton i)
             ]
+        ]
+
+
+
+-- querying
+
+
+size : Test
+size =
+    fuzz (Fuzz.list Fuzz.int) "size" <|
+        \xs ->
+            List.foldl Set.insert Set.empty xs
+                |> Set.size
+                |> Expect.equal (NSet.size <| NSet.fromList xs)
+
+
+member : Test
+member =
+    describe "member"
+        [ fuzz Fuzz.int "true" <|
+            \i ->
+                Set.singleton i
+                    |> Set.member i
+                    |> Expect.equal True
+        , fuzz Fuzz.int "false" <|
+            \i ->
+                Set.singleton (i + 1)
+                    |> Set.member i
+                    |> Expect.equal False
         ]
 
 
@@ -150,37 +182,21 @@ insert =
 --                         |> Set.diff (Set.singleton j)
 --                         |> Expect.equal (Set.singleton i)
 --         ]
--- size : Test
--- size =
---     fuzz (Fuzz.list Fuzz.int) "size" <|
---         \xs ->
---             List.foldl Set.insert Set.empty xs
---                 |> Set.size
---                 |> Expect.equal (NSet.size <| NSet.fromList xs)
--- member : Test
--- member =
---     describe "member"
---         [ fuzz Fuzz.int "true" <|
---             \i ->
---                 Set.singleton i
---                     |> Set.member i
---                     |> Expect.equal True
---         , fuzz Fuzz.int "false" <|
---             \i ->
---                 Set.singleton (i + 1)
---                     |> Set.member i
---                     |> Expect.equal False
---         ]
--- listOps : Test
--- listOps =
---     describe "fromList and toList"
---         [ fuzz (Fuzz.list Fuzz.int |> Fuzz.map (NSet.fromList >> NSet.toList)) "round-trip conversion" <|
---             \xs ->
---                 xs
---                     |> Set.fromList
---                     |> Set.toList
---                     |> Expect.equal xs
---         ]
+
+
+listOps : Test
+listOps =
+    describe "fromList and toList"
+        [ fuzz (Fuzz.list Fuzz.int |> Fuzz.map (NSet.fromList >> NSet.toList)) "round-trip conversion" <|
+            \xs ->
+                xs
+                    |> Set.fromList
+                    |> Set.toList
+                    |> Expect.equal xs
+        ]
+
+
+
 -- filter : Test
 -- filter =
 --     describe "filter"
@@ -272,5 +288,8 @@ all =
         [ empty
         , singleton
         , insert
+        , size
+        , member
+        , listOps
         , balance
         ]

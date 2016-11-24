@@ -83,9 +83,21 @@ naiveInsert item set =
 -- diff a b =
 --     filter (not << (flip member) a) b
 -- querying
--- member : comparable -> Set comparable -> Bool
--- member item =
---     foldr (\candidate acc -> acc || (candidate == item)) False
+
+
+member : comparable -> Set comparable -> Bool
+member item set =
+    case set of
+        Empty ->
+            False
+
+        Tree _ head left right ->
+            if item < head then
+                member item left
+            else if item > head then
+                member item right
+            else
+                True
 
 
 size : Set comparable -> Int
@@ -108,13 +120,22 @@ height set =
             height
 
 
+fromList : List comparable -> Set comparable
+fromList items =
+    List.foldl insert empty items
 
--- fromList : List comparable -> Set comparable
--- fromList items =
---     List.foldl insert empty items
--- toList : Set comparable -> List comparable
--- toList =
---     foldr (::) []
+
+toList : Set comparable -> List comparable
+toList set =
+    case set of
+        Empty ->
+            []
+
+        Tree _ head left right ->
+            toList left ++ [ head ] ++ toList right
+
+
+
 -- -- transform
 -- foldr : (comparable -> a -> a) -> a -> Set comparable -> a
 -- foldr fn acc set =
