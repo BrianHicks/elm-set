@@ -22,7 +22,11 @@ singleton item =
 
 tree : comparable -> Set comparable -> Set comparable -> Set comparable
 tree head left right =
-    Tree (max (height left) (height right) |> (+) 1) head left right
+    Tree
+        (max (height left) (height right) |> (+) 1)
+        head
+        left
+        right
 
 
 insert : comparable -> Set comparable -> Set comparable
