@@ -167,20 +167,26 @@ balance set =
             set
 
         Tree _ head left right ->
-            let
-                diff =
-                    height right - height left
-            in
-                if diff < -2 then
-                    rotr set |> balanceSubtrees
-                else if diff == -2 then
-                    tree head (rotl left) (balance right) |> rotr |> balanceSubtrees
-                else if diff > 2 then
-                    rotl set |> balanceSubtrees
-                else if diff == 2 then
-                    tree head (balance left) (rotr right) |> rotl |> balanceSubtrees
-                else
-                    set
+            if diff set == -2 && diff left == 1 then
+                tree head (rotl left) right |> rotr
+            else if diff set < -1 then
+                rotr set
+            else if diff set == 2 && diff right == -1 then
+                tree head left (rotr right) |> rotl
+            else if diff set > 1 then
+                rotl set
+            else
+                set
+
+
+diff : Set comparable -> Int
+diff tree =
+    case tree of
+        Empty ->
+            0
+
+        Tree _ _ left right ->
+            height right - height left
 
 
 balanceSubtrees : Set comparable -> Set comparable
