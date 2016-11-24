@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import BSTSet exposing (..)
-import Html exposing (Html, div, span, form, input, text, beginnerProgram)
+import Html exposing (Html, div, p, form, input, text, beginnerProgram)
 import Html.Attributes exposing (class, type_, value, style)
 import Html.Events exposing (onSubmit, onClick, onInput)
 
@@ -73,8 +73,12 @@ setView set =
                     , ( "flex-grow", size set |> toString )
                     ]
                 ]
-                [ span [ style [ ( "text-align", "center" ) ] ]
-                    [ "Value: \"" ++ head ++ "\" Height Balance: " ++ (height right - height left |> toString) |> text ]
+                [ p
+                    [ style [ ( "margin", "0" ) ] ]
+                    [ "Value: \"" ++ head ++ "\"" |> text ]
+                , p
+                    [ style [ ( "margin", "0" ) ] ]
+                    [ diff set |> toString |> (++) "Balance: " |> text ]
                 , div
                     [ style [ ( "display", "flex" ) ] ]
                     [ setView left
@@ -124,13 +128,6 @@ view model =
                 , type_ "button"
                 , value "Reset"
                 , onClick Reset
-                ]
-                []
-            , input
-                [ buttonStyle
-                , type_ "button"
-                , value "Balance"
-                , onClick Balance
                 ]
                 []
             ]
