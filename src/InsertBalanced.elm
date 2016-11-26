@@ -1,4 +1,4 @@
-module Main exposing (..)
+module InsertBalanced exposing (..)
 
 import BSTSet exposing (..)
 import Html exposing (Html, div, p, form, input, text, beginnerProgram)
