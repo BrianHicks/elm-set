@@ -200,9 +200,24 @@ balance set =
                 set
 
 
+balanceOnly2 : Set comparable -> Set comparable
+balanceOnly2 set =
+    case set of
+        Empty ->
+            set
+
+        Tree _ head left right ->
+            if diff set < -1 then
+                rotr set
+            else if diff set > 1 then
+                rotl set
+            else
+                set
+
+
 diff : Set comparable -> Int
-diff tree =
-    case tree of
+diff set =
+    case set of
         Empty ->
             0
 
