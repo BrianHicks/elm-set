@@ -101,13 +101,8 @@ member item set =
 
 
 size : Set comparable -> Int
-size set =
-    case set of
-        Empty ->
-            0
-
-        Tree _ _ left right ->
-            1 + size left + size right
+size =
+    foldl (\_ count -> count + 1) 0
 
 
 height : Set comparable -> Int
