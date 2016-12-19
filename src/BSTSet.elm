@@ -102,7 +102,7 @@ member item set =
 
 size : Set comparable -> Int
 size =
-    foldl (\_ count -> count + 1) 0
+    foldl (\_ acc -> acc + 1) 0
 
 
 height : Set comparable -> Int
