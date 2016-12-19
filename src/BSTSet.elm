@@ -136,37 +136,50 @@ toList set =
 
 
 
--- -- transform
--- foldr : (comparable -> a -> a) -> a -> Set comparable -> a
--- foldr fn acc set =
---     case set of
---         Empty ->
---             acc
---         Tree head left right ->
---             let
---                 accRight =
---                     foldr fn acc right
---                 accHead =
---                     fn head accRight
---                 accLeft =
---                     foldr fn accHead left
---             in
---                 accLeft
--- foldl : (comparable -> a -> a) -> a -> Set comparable -> a
--- foldl fn acc set =
---     case set of
---         Empty ->
---             acc
---         Tree head left right ->
---             let
---                 accLeft =
---                     foldl fn acc left
---                 accHead =
---                     fn head accLeft
---                 accRight =
---                     foldl fn accHead right
---             in
---                 accRight
+-- transform
+
+
+foldr : (comparable -> a -> a) -> a -> Set comparable -> a
+foldr fn acc set =
+    case set of
+        Empty ->
+            acc
+
+        Tree _ head left right ->
+            let
+                accRight =
+                    foldr fn acc right
+
+                accHead =
+                    fn head accRight
+
+                accLeft =
+                    foldr fn accHead left
+            in
+                accLeft
+
+
+foldl : (comparable -> a -> a) -> a -> Set comparable -> a
+foldl fn acc set =
+    case set of
+        Empty ->
+            acc
+
+        Tree _ head left right ->
+            let
+                accLeft =
+                    foldl fn acc left
+
+                accHead =
+                    fn head accLeft
+
+                accRight =
+                    foldl fn accHead right
+            in
+                accRight
+
+
+
 -- filter : (comparable -> Bool) -> Set comparable -> Set comparable
 -- filter cmp set =
 --     foldl

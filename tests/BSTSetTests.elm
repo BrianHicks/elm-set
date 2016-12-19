@@ -98,34 +98,6 @@ member =
 --                     |> Set.remove i
 --                     |> Expect.equal Set.empty
 --         ]
--- foldr : Test
--- foldr =
---     describe "foldr"
---         [ describe "test by counting" <|
---             [ test "empty" <|
---                 \() ->
---                     Set.foldr (+) 0 Set.Empty
---                         |> Expect.equal 0
---             , test "branch" <|
---                 \() ->
---                     Set.foldr (+) 0 (Set.Tree 1 Set.Empty Set.Empty)
---                         |> Expect.equal 1
---             ]
---         ]
--- foldl : Test
--- foldl =
---     describe "foldl"
---         [ describe "test by counting" <|
---             [ test "empty" <|
---                 \() ->
---                     Set.foldl (+) 0 Set.Empty
---                         |> Expect.equal 0
---             , test "branch" <|
---                 \() ->
---                     Set.foldl (+) 0 (Set.Tree 1 Set.Empty Set.Empty)
---                         |> Expect.equal 1
---             ]
---         ]
 -- union : Test
 -- union =
 --     describe "union"
@@ -216,6 +188,39 @@ listOps =
 --                     |> Set.filter ((==) (i + 1))
 --                     |> Expect.equal Set.empty
 --         ]
+-- transform
+
+
+foldr : Test
+foldr =
+    describe "foldr"
+        [ describe "test by counting" <|
+            [ test "empty" <|
+                \() ->
+                    Set.foldr (+) 0 Set.Empty
+                        |> Expect.equal 0
+            , test "branch" <|
+                \() ->
+                    Set.foldr (+) 0 (Set.tree 1 Set.Empty Set.Empty)
+                        |> Expect.equal 1
+            ]
+        ]
+
+
+foldl : Test
+foldl =
+    describe "foldl"
+        [ describe "test by counting" <|
+            [ test "empty" <|
+                \() ->
+                    Set.foldl (+) 0 Set.Empty
+                        |> Expect.equal 0
+            , test "branch" <|
+                \() ->
+                    Set.foldl (+) 0 (Set.tree 1 Set.Empty Set.Empty)
+                        |> Expect.equal 1
+            ]
+        ]
 
 
 balance : Test
@@ -291,5 +296,7 @@ all =
         , size
         , member
         , listOps
+        , foldl
+        , foldr
         , balance
         ]
