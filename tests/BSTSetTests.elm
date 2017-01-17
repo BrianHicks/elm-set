@@ -83,77 +83,72 @@ member =
         ]
 
 
+remove : Test
+remove =
+    describe "remove"
+        [ test "empty" <|
+            \_ ->
+                Set.empty
+                    |> Set.remove 1
+                    |> Expect.equal Set.empty
+        , fuzz Fuzz.int "singleton" <|
+            \i ->
+                Set.singleton i
+                    |> Set.remove i
+                    |> Expect.equal Set.empty
+        ]
 
--- remove : Test
--- remove =
---     describe "remove"
---         [ test "empty" <|
---             \_ ->
---                 Set.empty
---                     |> Set.remove 1
---                     |> Expect.equal Set.empty
---         , fuzz Fuzz.int "singleton" <|
---             \i ->
---                 Set.singleton i
---                     |> Set.remove i
---                     |> Expect.equal Set.empty
---         ]
--- union : Test
--- union =
---     describe "union"
---         [ fuzz Fuzz.int "same" <|
---             \i ->
---                 Set.singleton i
---                     |> Set.union (Set.singleton i)
---                     |> Expect.equal (Set.singleton i)
---         , fuzz (Fuzz.tuple ( Fuzz.int, Fuzz.int )) "different" <|
---             \( i, j ) ->
---                 let
---                     expectation =
---                         if i == j then
---                             [ i ]
---                         else
---                             [ i, j ] |> List.sort
---                 in
---                     Set.singleton i
---                         |> Set.union (Set.singleton j)
---                         |> Set.toList
---                         |> Expect.equal expectation
---         ]
--- intersect : Test
--- intersect =
---     describe "intersect"
---         [ fuzz Fuzz.int "same" <|
---             \i ->
---                 Set.singleton i
---                     |> Set.intersect (Set.singleton i)
---                     |> Expect.equal (Set.singleton i)
---         , fuzz (Fuzz.tuple ( Fuzz.int, Fuzz.int )) "different" <|
---             \( i, j ) ->
---                 if i == j then
---                     Expect.true "we're not testing this" True
---                 else
---                     Set.singleton i
---                         |> Set.intersect (Set.singleton j)
---                         |> Expect.equal Set.empty
---         ]
--- diff : Test
--- diff =
---     describe "diff"
---         [ fuzz Fuzz.int "same" <|
---             \i ->
---                 Set.singleton i
---                     |> Set.diff (Set.singleton i)
---                     |> Expect.equal Set.empty
---         , fuzz (Fuzz.tuple ( Fuzz.int, Fuzz.int )) "different" <|
---             \( i, j ) ->
---                 if i == j then
---                     Expect.true "we're not testing this" True
---                 else
---                     Set.fromList [ i, j ]
---                         |> Set.diff (Set.singleton j)
---                         |> Expect.equal (Set.singleton i)
---         ]
+
+union : Test
+union =
+    describe "union"
+        [ fuzz Fuzz.int "same" <|
+            \i ->
+                Set.singleton i
+                    |> Set.union (Set.singleton i)
+                    |> Expect.equal (Set.singleton i)
+        , fuzz (Fuzz.tuple ( Fuzz.int, Fuzz.int )) "different" <|
+            \( i, j ) ->
+                let
+                    expectation =
+                        if i == j then
+                            [ i ]
+                        else
+                            [ i, j ] |> List.sort
+                in
+                    Set.singleton i
+                        |> Set.union (Set.singleton j)
+                        |> Set.toList
+                        |> Expect.equal expectation
+        ]
+
+
+intersect : Test
+intersect =
+    fuzz (Fuzz.tuple ( Fuzz.int, Fuzz.int )) "intersect" <|
+        \( i, j ) ->
+            let
+                intersection =
+                    Set.intersect (Set.singleton i) (Set.singleton j)
+            in
+                if i == j then
+                    Expect.equal (Set.singleton i) intersection
+                else
+                    Expect.equal Set.empty intersection
+
+
+diff : Test
+diff =
+    fuzz (Fuzz.tuple ( Fuzz.int, Fuzz.int )) "diff" <|
+        \( i, j ) ->
+            let
+                difference =
+                    Set.diff (Set.singleton i) (Set.singleton j)
+            in
+                if i == j then
+                    Expect.equal Set.empty difference
+                else
+                    Expect.equal (Set.singleton j) difference
 
 
 listOps : Test
@@ -168,26 +163,28 @@ listOps =
         ]
 
 
+filter : Test
+filter =
+    describe "filter"
+        [ test "empty" <|
+            \_ ->
+                Set.empty
+                    |> Set.filter (always False)
+                    |> Expect.equal Set.empty
+        , fuzz Fuzz.int "matches" <|
+            \i ->
+                Set.singleton i
+                    |> Set.filter ((==) i)
+                    |> Expect.equal (Set.singleton i)
+        , fuzz Fuzz.int "does not match" <|
+            \i ->
+                Set.singleton i
+                    |> Set.filter ((==) (i + 1))
+                    |> Expect.equal Set.empty
+        ]
 
--- filter : Test
--- filter =
---     describe "filter"
---         [ test "empty" <|
---             \_ ->
---                 Set.empty
---                     |> Set.filter (always False)
---                     |> Expect.equal Set.empty
---         , fuzz Fuzz.int "matches" <|
---             \i ->
---                 Set.singleton i
---                     |> Set.filter ((==) i)
---                     |> Expect.equal (Set.singleton i)
---         , fuzz Fuzz.int "does not match" <|
---             \i ->
---                 Set.singleton i
---                     |> Set.filter ((==) (i + 1))
---                     |> Expect.equal Set.empty
---         ]
+
+
 -- transform
 
 
@@ -299,4 +296,9 @@ all =
         , foldl
         , foldr
         , balance
+        , remove
+        , union
+        , filter
+        , intersect
+        , diff
         ]

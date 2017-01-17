@@ -59,29 +59,41 @@ naiveInsert item set =
                 set
 
 
+remove : comparable -> Set comparable -> Set comparable
+remove item set =
+    case set of
+        Empty ->
+            set
 
--- remove : comparable -> Set comparable -> Set comparable
--- remove item set =
---     case set of
---         Empty ->
---             set
---         Tree head left right ->
---             if item < head then
---                 Tree head (remove item left) right
---             else if item > head then
---                 Tree head left (remove item right)
---             else
---                 union left right
--- -- combine
--- union : Set comparable -> Set comparable -> Set comparable
--- union =
---     foldl insert
--- intersect : Set comparable -> Set comparable -> Set comparable
--- intersect a b =
---     filter ((flip member) a) b
--- diff : Set comparable -> Set comparable -> Set comparable
--- diff a b =
---     filter (not << (flip member) a) b
+        Tree _ head left right ->
+            if item < head then
+                tree head (remove item left) right
+            else if item > head then
+                tree head left (remove item right)
+            else
+                union left right
+
+
+
+-- combine
+
+
+union : Set comparable -> Set comparable -> Set comparable
+union =
+    foldl insert
+
+
+intersect : Set comparable -> Set comparable -> Set comparable
+intersect a b =
+    filter ((flip member) a) b
+
+
+diff : Set comparable -> Set comparable -> Set comparable
+diff a b =
+    filter (not << (flip member) a) b
+
+
+
 -- querying
 
 
@@ -174,18 +186,20 @@ foldl fn acc set =
                 accRight
 
 
+filter : (comparable -> Bool) -> Set comparable -> Set comparable
+filter cmp set =
+    foldl
+        (\item acc ->
+            if cmp item then
+                insert item acc
+            else
+                acc
+        )
+        empty
+        set
 
--- filter : (comparable -> Bool) -> Set comparable -> Set comparable
--- filter cmp set =
---     foldl
---         (\head acc ->
---             if cmp head then
---                 acc
---             else
---                 remove head acc
---         )
---         set
---         set
+
+
 -- rebalancing
 
 
@@ -196,16 +210,16 @@ balance set =
             set
 
         Tree _ head left right ->
-            if diff set == -2 && diff left == 1 then
+            if heightDiff set == -2 && heightDiff left == 1 then
                 -- left leaning tree with right-leaning left subtree. Rotate left, then right.
                 tree head (rotl left) right |> rotr
-            else if diff set < -1 then
+            else if heightDiff set < -1 then
                 -- left leaning tree, generally. Rotate right.
                 rotr set
-            else if diff set == 2 && diff right == -1 then
+            else if heightDiff set == 2 && heightDiff right == -1 then
                 -- right leaning tree with left-leaning right subtree. Rotate right, then left.
                 tree head left (rotr right) |> rotl
-            else if diff set > 1 then
+            else if heightDiff set > 1 then
                 -- right leaning tree, generally. Rotate left.
                 rotl set
             else
@@ -220,16 +234,16 @@ balanceOnly2 set =
             set
 
         Tree _ head left right ->
-            if diff set < -1 then
+            if heightDiff set < -1 then
                 rotr set
-            else if diff set > 1 then
+            else if heightDiff set > 1 then
                 rotl set
             else
                 set
 
 
-diff : Set comparable -> Int
-diff set =
+heightDiff : Set comparable -> Int
+heightDiff set =
     case set of
         Empty ->
             0
