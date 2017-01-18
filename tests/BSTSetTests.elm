@@ -5,7 +5,6 @@ import Expect
 import Fuzz
 import List
 import Set as NSet
-import String
 import Test exposing (..)
 
 
@@ -139,16 +138,28 @@ intersect =
 
 diff : Test
 diff =
-    fuzz (Fuzz.tuple ( Fuzz.int, Fuzz.int )) "diff" <|
-        \( i, j ) ->
-            let
-                difference =
-                    Set.diff (Set.singleton i) (Set.singleton j)
-            in
-                if i == j then
-                    Expect.equal Set.empty difference
-                else
-                    Expect.equal (Set.singleton j) difference
+    describe "diff"
+        [ fuzz (Fuzz.tuple ( Fuzz.int, Fuzz.int )) "diff" <|
+            \( i, j ) ->
+                let
+                    difference =
+                        Set.diff (Set.singleton i) (Set.singleton j)
+                in
+                    if i == j then
+                        Expect.equal Set.empty difference
+                    else
+                        Expect.equal (Set.singleton i) difference
+        , fuzz (Fuzz.tuple ( Fuzz.int, Fuzz.int )) "same as core" <|
+            \( i, j ) ->
+                let
+                    ours =
+                        Set.diff (Set.singleton i) (Set.singleton j)
+
+                    stdlib =
+                        NSet.diff (NSet.singleton i) (NSet.singleton j)
+                in
+                    Expect.equal (Set.toList ours) (NSet.toList stdlib)
+        ]
 
 
 listOps : Test
@@ -181,6 +192,27 @@ filter =
                 Set.singleton i
                     |> Set.filter ((==) (i + 1))
                     |> Expect.equal Set.empty
+        ]
+
+
+partition : Test
+partition =
+    describe "partition"
+        [ test "empty" <|
+            \_ ->
+                Set.empty
+                    |> Set.partition (always False)
+                    |> Expect.equal ( Set.empty, Set.empty )
+        , fuzz Fuzz.int "matches" <|
+            \i ->
+                Set.singleton i
+                    |> Set.partition ((==) i)
+                    |> Expect.equal ( Set.singleton i, Set.empty )
+        , fuzz Fuzz.int "does not match" <|
+            \i ->
+                Set.singleton i
+                    |> Set.partition (always False)
+                    |> Expect.equal ( Set.empty, Set.singleton i )
         ]
 
 
@@ -299,6 +331,7 @@ all =
         , remove
         , union
         , filter
+        , partition
         , intersect
         , diff
         ]

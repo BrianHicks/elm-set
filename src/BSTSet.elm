@@ -85,12 +85,12 @@ union =
 
 intersect : Set comparable -> Set comparable -> Set comparable
 intersect a b =
-    filter ((flip member) a) b
+    filter (\item -> member item a) b
 
 
 diff : Set comparable -> Set comparable -> Set comparable
 diff a b =
-    filter (not << (flip member) a) b
+    filter (\item -> not <| member item b) a
 
 
 
@@ -196,6 +196,19 @@ filter cmp set =
                 acc
         )
         empty
+        set
+
+
+partition : (comparable -> Bool) -> Set comparable -> ( Set comparable, Set comparable )
+partition cmp set =
+    foldl
+        (\item ( yes, no ) ->
+            if cmp item then
+                ( insert item yes, no )
+            else
+                ( yes, insert item no )
+        )
+        ( empty, empty )
         set
 
 
