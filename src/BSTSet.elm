@@ -146,6 +146,14 @@ toList set =
 -- transform
 
 
+map : (comparable -> comparable2) -> Set comparable -> Set comparable2
+map fn set =
+    foldl
+        (\item acc -> insert (fn item) acc)
+        empty
+        set
+
+
 foldr : (comparable -> a -> a) -> a -> Set comparable -> a
 foldr fn acc set =
     case set of

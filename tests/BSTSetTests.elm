@@ -220,6 +220,31 @@ partition =
 -- transform
 
 
+map : Test
+map =
+    describe "map"
+        [ test "increments" <|
+            \() ->
+                Set.singleton 1
+                    |> Set.map ((+) 1)
+                    |> Expect.equal (Set.singleton 2)
+        , fuzz (Fuzz.list Fuzz.int) "matches core" <|
+            \xs ->
+                let
+                    ours =
+                        Set.fromList xs
+                            |> Set.map ((+) 1)
+                            |> Set.toList
+
+                    stdlib =
+                        NSet.fromList xs
+                            |> NSet.map ((+) 1)
+                            |> NSet.toList
+                in
+                    Expect.equal stdlib ours
+        ]
+
+
 foldr : Test
 foldr =
     describe "foldr"
@@ -330,6 +355,7 @@ all =
         , balance
         , remove
         , union
+        , map
         , filter
         , partition
         , intersect
