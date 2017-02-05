@@ -90,11 +90,34 @@ remove =
                 Set.empty
                     |> Set.remove 1
                     |> Expect.equal Set.empty
+        , test "remove stays balanced" <|
+            \_ ->
+                List.range 1 10
+                    |> Set.fromList
+                    |> Set.remove 3
+                    |> Set.remove 2
+                    |> Set.remove 1
+                    |> Set.heightDiff
+                    |> Expect.atMost 1
         , fuzz Fuzz.int "singleton" <|
             \i ->
                 Set.singleton i
                     |> Set.remove i
                     |> Expect.equal Set.empty
+        , fuzz (Fuzz.list Fuzz.int) "same as core" <|
+            \is ->
+                let
+                    expected =
+                        NSet.fromList is
+                            |> NSet.remove (List.head is |> Maybe.withDefault 0)
+                            |> NSet.toList
+
+                    actual =
+                        Set.fromList is
+                            |> Set.remove (List.head is |> Maybe.withDefault 0)
+                            |> Set.toList
+                in
+                    Expect.equal expected actual
         ]
 
 

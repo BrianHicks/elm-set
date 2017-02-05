@@ -67,9 +67,9 @@ remove item set =
 
         Tree _ head left right ->
             if item < head then
-                tree head (remove item left) right
+                tree head (remove item left) right |> balance
             else if item > head then
-                tree head left (remove item right)
+                tree head left (remove item right) |> balance
             else
                 union left right
 
